@@ -5,15 +5,15 @@ using System.Text;
 public class JobLogger 
 { 
  
-    private static bool _logToFile;
-    private static bool _logToConsole;
-    private static bool _logMessage;
-    private static bool _logWarning;
-    private static bool _logError;
-    private static bool LogToDatabase;
+    private static bool _logToFile; //grabar en archivo
+    private static bool _logToConsole; //imprimir en consola
+    private static bool _logMessage; //para pintar como mensaje
+    private static bool _logWarning; //para pintar como alerta
+    private static bool _logError; //para pintar como error
+    private static bool LogToDatabase; //grabar en DB //podemos cambiar la notación de este nombre de propiedad. a camel case como las demás, ahora está en pascal
     private bool _initialized; 
-    
-    public JobLogger(bool logToFile, bool logToConsole, bool logToDatabase, bool logMessage, bool logWarning, bool logError)
+    //constructor
+    public JobLogger(bool logToFile, bool logToConsole, bool logToDatabase, bool logMessage, bool logWarning, bool logError) //constructor change the notation
     { 
         _logError = logError; 
         _logMessage = logMessage; 
@@ -23,9 +23,11 @@ public class JobLogger
         _logToConsole = logToConsole; 
     } 
  
-    public static void LogMessage(string message, bool message, bool warning, bool error)
+    #region Methods to Log messages, alerts or errors
+
+    public static void LogMessage(string message, bool message, bool warning, bool error) //here two parameters share the same name, it's incorrect
     { 
-        message.Trim(); 
+        message.Trim(); //corta los espacios adelante y atras
         if (message == null || message.Length == 0) 
         { 
             return; 
@@ -39,7 +41,7 @@ public class JobLogger
             throw new Exception("Error or Warning or Message must be specified"); 
         } 
  
-        System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]); 
+        System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]); //ya esta declarada la conexión correctamente
         connection.Open(); 
 
 
@@ -93,5 +95,6 @@ public class JobLogger
         } 
         Console.WriteLine(DateTime.Now.ToShortDateString() + message); 
     } 
+    #endregion
 } 
   
