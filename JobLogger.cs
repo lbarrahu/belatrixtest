@@ -5,13 +5,16 @@ using System.Text;
 public class JobLogger 
 { 
  
-    private static bool _logToFile; //grabar en archivo
-    private static bool _logToConsole; //imprimir en consola
-    private static bool _logMessage; //para pintar como mensaje
-    private static bool _logWarning; //para pintar como alerta
-    private static bool _logError; //para pintar como error
-    private static bool LogToDatabase; //grabar en DB //podemos cambiar la notación de este nombre de propiedad. a camel case como las demás, ahora está en pascal
+    //the underscore notation as prefix names are correct since they work as private variables
+    //We had better remove the keyword static to avoid problems if the class is invoqued more than once in a process
+    private static bool _logToFile; //save in file
+    private static bool _logToConsole; //print in console
+    private static bool _logMessage; //to paint as a message
+    private static bool _logWarning; //to paint as an alert
+    private static bool _logError; //to paint as an error
+    private static bool LogToDatabase; //save in DB, we should change the naming notation for this variable like the ones in previous lines in camel case and with an underscore as prefix
     private bool _initialized; 
+
     //constructor
     public JobLogger(bool logToFile, bool logToConsole, bool logToDatabase, bool logMessage, bool logWarning, bool logError) //constructor change the notation
     { 
@@ -20,8 +23,9 @@ public class JobLogger
         _logWarning = logWarning; 
         LogToDatabase = logToDatabase; 
         _logToFile = logToFile; 
-        _logToConsole = logToConsole; 
-    } 
+        _logToConsole = logToConsole;
+        _initialized = 0;
+} 
  
     #region Methods to Log messages, alerts or errors
 
