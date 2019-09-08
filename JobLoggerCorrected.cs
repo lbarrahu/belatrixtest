@@ -53,6 +53,7 @@ public class JobLogger
         }
 
     }
+
     private void DoLogTypesPermitted(string messageText, int t)
     {
         if (_logToConsole)
@@ -61,7 +62,11 @@ public class JobLogger
         }
         if (_logToDatabase)
         {
-            LogInDataBase(messageText, t);
+            int result = LogInDataBase(messageText, t);
+            if(result == false)
+            {
+                throw new Exception("Could not register in database.");
+            }
         }
         if (_logToFile)
         {
@@ -136,8 +141,9 @@ public class JobLogger
         Console.WriteLine(DateTime.Now.ToShortDateString() + message);
     }
 
-    private void LogInDataBase(string message, int t)
+    private bool LogInDataBase(string message, int t)
     {
+        int insertedRow = 0;
         System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]); //ya esta declarada la conexión correctamente
         
         string insertString = "Insert into Log Values('" + message + "', " + t.ToString() + ")";
@@ -145,15 +151,24 @@ public class JobLogger
         try
         {
             connection.Open();
-            command.ExecuteNonQuery();
+            insertedRow = command.ExecuteNonQuery();
         }
         catch (Exception ex)
         {
             throw new Exception("Error inserting record in the database: " + ex.Message);
+            
         }
         if (connection != null)
         {
             connection.Close();
+        }
+        if (insertedRow == 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
 

@@ -13,13 +13,13 @@ public class JobLogger
     private static bool LogToDatabase; //save in DB, we should change the naming notation for this variable like the ones in previous lines in camel case and with an underscore as prefix
 
     //usar estas tres boleanas para ver que es de lo que se grabara el los si solo _logMessage o _logWarning o _logError
-    private static bool _logMessage; //to paint as a message
-    private static bool _logWarning; //to paint as an alert
-    private static bool _logError; //to paint as an error
+    private static bool _logMessage; //to choose what gets logged
+    private static bool _logWarning; //to choose what gets logged
+    private static bool _logError; //to choose what gets logged
 
+    //never used.
     private bool _initialized;
-
-    //constructor HERE WE COULD ADD ONE ELSE CONSTRUCTOR METHOD WITH NO PARAMETER, BUT THERE ARE NO public properties but LogMessage().
+    
     public JobLogger(bool logToFile, bool logToConsole, bool logToDatabase, bool logMessage, bool logWarning, bool logError)
     {
         _logError = logError;
@@ -34,7 +34,7 @@ public class JobLogger
 
     public static void LogMessage(string message, bool message, bool warning, bool error) //here two parameters share the same name, it's incorrect CHANGE
     {
-        message.Trim(); //removes all leading and trailing white-space
+        message.Trim();
         if (message == null || message.Length == 0) // if the string is empty or null so it terminates execution of the method. WE CAN ADD AN EXCEPTION
         {
             return;
@@ -42,23 +42,21 @@ public class JobLogger
 
         if (!_logToConsole && !_logToFile && !LogToDatabase)
         {
-            //throwing a new error, because nothinG was selected print, db or textfile. IT'S NECESARY TO END THE PROCESS
+            //throwing a new error, because nothinG was selected: print, db or textfile. IT'S NECESARY TO END THE PROCESS
             throw new Exception("Invalid configuration"); 
         }
         if ((!_logError && !_logMessage && !_logWarning) || (!message && !warning && !error))
         { 
-            //Correcto, el tipo de mensaje debe ser al menos uno delos tres tipos, y el tipo de log permitido debe ser al menos uno de los tres.
             throw new Exception("Error or Warning or Message must be specified");
             //IT'S NECESARY TO END THE PROCESS
         }
 
-        System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]); //CADENA DE CONEXIÓN
-        //aquí ya abrió conexión
+        System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
         connection.Open(); 
 
 
         int t;
-        //valida que si el mensaje esta de un tipo que esta permitido hacerse LOG, entonces lo hace.
+        //if the message type is the same as the permitted, so it Logs.
         if (message && _logMessage)
         {
             t = 1;
@@ -71,21 +69,21 @@ public class JobLogger
         {
             t = 3;
         }
-        //falto enviar la conexión ERROR IMPLEMENTAR TRY CATCH (PUEDE QUE T NUNCA OBTENGA SU VALOR)
+        //IMPLEMENT TRY CATCH ()
         System.Data.SqlClient.SqlCommand command = new System.Data.SqlClient.SqlCommand("Insert into Log Values('" + message + "', " + t.ToString() + ")");
-        //es correcto porque no se espera valor de la ejecución
-        command.ExecuteNonQuery(); 
-        //es necesario cerrar la conexión WARNING
+        
+        command.ExecuteNonQuery();
+        //WARNING, NEED TO CLOSE CONNECTION.
 
-        //en esta cadena graba el texto que está en el archivo de logs
+        
         string l;
 
-        //si no existe el archivo entonces lo lee, ESTA MAL, mejor creamos un metodo que si no existe lo crea y escribe y si sí existe abre el archivo para agregarle una línea 
+        //If it does not exist then read it, so it's a condition error, We had better implement a method that if the file doesn't exist, it creates that.
         if (!System.IO.File.Exists(System.Configuration.ConfigurationManager.AppSettings["LogFileDirectory"] + "LogFile" + DateTime.Now.ToShortDateString() + ".txt"))
         {
             l = System.IO.File.ReadAllText(System.Configuration.ConfigurationManager.AppSettings["LogFileDirectory"] + "LogFile" + DateTime.Now.ToShortDateString() + ".txt");
         }
-        //valida que si el mensaje esta de un tipo que esta permitido hacerse LOG, entonces lo hace. pero no escribe que tipo de mensaje era. T
+        //if the message type is the same as the permitted, so it Logs. BUT IT DOESN'T INDICATE WHICH TYPE OF MESSAGE IS BEING WRITTEN.
         if (error && _logError)
         {
             l = l + DateTime.Now.ToShortDateString() + message;
@@ -99,10 +97,10 @@ public class JobLogger
             l = l + DateTime.Now.ToShortDateString() + message;
         }
 
-        //ahora sobreescribe el contenido del log mantener el contenido del log en una variable puede generar problemas si el contenido del los es muy grande.
+        //WE SHOULD ADD A LINE, AND DO NOT HAVE TO OVERWRITE.
         System.IO.File.WriteAllText(System.Configuration.ConfigurationManager.AppSettings["LogFileDirectory"] + "LogFile" + DateTime.Now.ToShortDateString() + ".txt", l);
 
-        //valida que si el mensaje esta de un tipo que esta permitido hacerse LOG, entonces lo hace.
+        //if the message type is the same as the permitted, so it Logs.
         if (error && _logError)
         {
             Console.ForegroundColor = ConsoleColor.Red;
