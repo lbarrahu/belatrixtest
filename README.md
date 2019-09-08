@@ -1,6 +1,6 @@
 # belatrixtest
 
-##Code Review
+## Code Review
 
 Please review the following code snippet. Assume that all referenced assemblies have been properly included.
 The code is used to log different messages throughout an application. We want the ability to be able to log to a text file, the console and/or the database. 
@@ -9,7 +9,7 @@ We also want the ability to selectively be able to choose what gets logged, such
 
 1) If you were to review the following code, what feedback would you give? Please be specific and indicate any errors that would occur as well as other best practices and code refactoring that should be done.
 
-###As I see there are some errors:
+### As I see there are some errors:
 ```
 Two parameters of a method have the same name.
 Naming conventions. LogToDatabase is in PascalCase and the others in camelCase.
@@ -22,7 +22,7 @@ I saw too that a rule was missing, to control whether the Log was displayed on t
 
 I left the file JobLoggerCommented which has the code baseline, with comments on the lines that I think would have errors.
 ```
-###Code refactoring:
+### Code refactoring:
 ```
 Looking for a simple Log. I would make the following changes:
 First I'm going to correct the errors mentioned above.
